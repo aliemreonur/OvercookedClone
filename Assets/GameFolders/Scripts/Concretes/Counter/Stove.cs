@@ -1,29 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Stove : Counter
 {
+    #region Fields
+    public ICookable cookable => _cookable;
     [SerializeField] private GameObject _stoveOn;
     private ProgressBar _progressBar;
     private const string MEAT = "Meat";
-
-    public ICookable cookable => _cookable;
     private ICookable _cookable;
+    #endregion
 
     protected override void Awake()
     {
         base.Awake();
         CookActive(false);
         SetProgressBar();
-    }
-
-    private void SetProgressBar()
-    {
-        _progressBar = GetComponentInChildren<ProgressBar>();
-        if (_progressBar == null)
-            Debug.Log("The progress bar of the stove is null");
-        _progressBar.gameObject.SetActive(false);
     }
 
     public override void HandleInteraction(IPlayerInteractionHandler playerInteractionHandler)
@@ -64,7 +55,6 @@ public class Stove : Counter
     public override void CollectableMovedToPlayer(IPlayerInteractionHandler playerInteractionHandler)
     {
         CookingOperation(false);
-        //base.CollectableMovedToPlayer(playerInteractionHandler);
         playerInteractionHandler.GatherFood(collectable);
         CounterEmpty();
     }
@@ -72,12 +62,10 @@ public class Stove : Counter
     private void CookActive(bool isActive)
     {
         _stoveOn.SetActive(isActive);
-        //_stoveParticles.emission.enabled = isActive;
     }
 
     private void CookingOperation(bool isOn)
     {
-        //_processable.PlacedOnStove(isOn);
         _progressBar.gameObject.SetActive(isOn);
         IsFilled = isOn;
         CookActive(isOn);
@@ -91,6 +79,13 @@ public class Stove : Counter
         else
             _cookable.ProcessActive();
       
+    }
+    private void SetProgressBar()
+    {
+        _progressBar = GetComponentInChildren<ProgressBar>();
+        if (_progressBar == null)
+            Debug.Log("The progress bar of the stove is null");
+        _progressBar.gameObject.SetActive(false);
     }
 
 }

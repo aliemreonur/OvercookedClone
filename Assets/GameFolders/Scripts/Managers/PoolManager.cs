@@ -1,17 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class PoolManager : Singleton<PoolManager>
 {
-    [System.Serializable]
-    public struct Pool
-    {
-        [HideInInspector] public List<GameObject> poolObjects;
-        public GameObject objPrefab;
-        public int poolSize;
-    }
-
     [SerializeField] private Pool[] _allObjPools; //All collectables
     public Vector3 spawnPos => _spawnPos;
     private Vector3 _spawnPos = new Vector3(500, 500, 500);
@@ -19,7 +10,6 @@ public class PoolManager : Singleton<PoolManager>
     protected override void Awake()
     {
         base.Awake();
-
         InitialSpawn();
     }
 
@@ -52,9 +42,7 @@ public class PoolManager : Singleton<PoolManager>
                 spawnedObj.SetActive(false);
             }
         }
-
     }
-
 
     private GameObject ReturnNewObj(int id)
     {

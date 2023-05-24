@@ -1,29 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 using DG.Tweening;
 
 public class Collectable : MonoBehaviour, ICollectable, IThrowable
 {
+    #region Fields
     public event Action OnTrashed;
     public Transform EntityTransform => transform; 
     public ICuttable processable;
-    [field: SerializeField] public int Id { get; private set; }
     public bool IsProcessable { get; set; }
     public bool IsReadyToServe { get; private set; }
     public int ServableState { get; private set; }
     public int InitialPoolSize => _initialPoolSize;
+    [field: SerializeField] public int Id { get; private set; }
 
-    public static Dictionary<int, Collectable> collectablesPool = new Dictionary<int, Collectable>();
 
+    private int _currentState = 0;
+    private int _initialPoolSize = 8;
+    private bool _isGrounded = false;
+    private Transform _parentTransform;
     private GameManager _gameManager;
     private Rigidbody _rigidbody;
     private BoxCollider _collider;
-    private int _currentState = 0;
-    private int _initialPoolSize = 8;
-
-    private bool _isGrounded = false;
+    #endregion
 
     protected virtual void Awake()
     {
@@ -39,14 +38,34 @@ public class Collectable : MonoBehaviour, ICollectable, IThrowable
 
         if (_collider == null)
             Debug.Log("Collider is null");
+        _collider.enabled = false;
+        _parentTransform = transform.parent;
+    }
+
+    protected virtual void Update()
+    {
+        if (_isGrounded || !_gameManager.IsRunning)
+            return;
+
+        if (transform.position.y < 0.1f)
+        {
+            _rigidbody.isKinematic = true;
+            _collider.isTrigger = true;
+            _isGrounded = true;
+            _collider.enabled = true;
+        }
 
     }
 
     public virtual void DeActivate()
     {
-        gameObject.SetActive(false);
         IsReadyToServe = false;
         _currentState = 0;
+        _collider.enabled = false;
+        gameObject.SetActive(false);
+        transform.position = new Vector3(500, 500, 500);
+        transform.parent = _parentTransform;
+
     }
 
     public void SetInitials(int id, bool processable, int servableState)
@@ -60,6 +79,7 @@ public class Collectable : MonoBehaviour, ICollectable, IThrowable
 
     public void ChangePos(Vector3 posToMove, Transform parentTransform)
     {
+        _collider.enabled = false;
         transform.parent = parentTransform;
         transform.localPosition = posToMove;
         transform.rotation = Quaternion.identity;
@@ -81,24 +101,8 @@ public class Collectable : MonoBehaviour, ICollectable, IThrowable
         ChangePos(playerInteractionHandler.PlayerFoodPosition, playerInteractionHandler.EntityTransform);
     }
 
-
-    protected virtual void Update()
+    public void Throw() //more like drop to floor
     {
-        if (_isGrounded || !_gameManager.IsRunning)
-            return;
-
-        if (transform.position.y < 0.1f)
-        {
-            _rigidbody.isKinematic = true;
-            _collider.isTrigger = true;
-            _isGrounded = true;
-        }
-            
-    }
-
-    public void Throw()
-    {
-        
         if (_rigidbody == null)
             return;
         
@@ -107,7 +111,6 @@ public class Collectable : MonoBehaviour, ICollectable, IThrowable
         _rigidbody.isKinematic = false;
         _isGrounded = false;
         //_rigidbody.AddRelativeForce(Vector3.forward * 50000f * Time.deltaTime);
-        
     }
 
     public void StateUpdated()
@@ -121,9 +124,15 @@ public class Collectable : MonoBehaviour, ICollectable, IThrowable
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.TryGetComponent(out IEntityController playerController))
+        //for now, rather than interacting, player will automatically gather the collectable if in contact range
+        if (other.TryGetComponent(out IPlayerController playerController))
         {
-            //Debug.Log("Player!");
+            IPlayerInteractionHandler playerInteractionHandler = playerController.playerInteractionHandler;
+            if (playerInteractionHandler == null)
+                return;
+
+            if (playerInteractionHandler.HasPlateOnHand || !playerInteractionHandler.HasFoodOnHand)
+                playerInteractionHandler.GatherFood(this);
         }
     }
 

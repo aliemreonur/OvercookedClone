@@ -1,14 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class PlayerController : Singleton<PlayerController>, IEntityController
+public class PlayerController : Singleton<PlayerController>, IPlayerController
 {
-    //better to mvoe these to a settings script
     [SerializeField] private float _movementSpeed = 5f;
-    [SerializeField] private float _interactionCooldownTime = 0.5f;
 
+    public IPlayerInteractionHandler playerInteractionHandler => _playerInteractionHandler;
     public Transform EntityTransform => transform;
     public bool IsWalking => _inputHandler.MovementVector != Vector3.zero;
 
@@ -44,13 +41,6 @@ public class PlayerController : Singleton<PlayerController>, IEntityController
         if (_playerInteractionHandler.IsAlternateInteracting)
             _playerInteractionHandler.AlternateInteract();
 
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Log(_playerInteractionHandler.HasFoodOnHand);
-            Debug.Log("plate: " + _playerInteractionHandler.HasPlateOnHand);
-        }
-
-        TempBugFix();
     }
 
     private void FixedUpdate()
@@ -66,17 +56,4 @@ public class PlayerController : Singleton<PlayerController>, IEntityController
         _stateMachine.UnSubscribe();
     }
 
-    //BUG: boştayken interact!
-    //this bug fix is for a bug that results in carrying an active object on hand 
-    private void TempBugFix()
-    {
-        if(!_playerInteractionHandler.HasFoodOnHand && !_playerInteractionHandler.HasPlateOnHand)
-        {
-            if(transform.childCount > 1)
-            {
-                Destroy(transform.GetChild(1).gameObject);
-                Debug.Log("Bug prevented, find out!");
-            }
-        }
-    }
 }

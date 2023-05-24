@@ -8,7 +8,6 @@ public interface IPlate : ICollectable
     event Action OnPlateDelivered;
     FoodsOrder foodsOrder { get; }
     int NumberOfFoodsActive { get; }
-    //FoodsOrder activeFoods { get; }
     void AddFoodToPlate(IPlayerInteractionHandler playerInteractionHandler, out bool hasSucceeded);
     void Delivered();
 }

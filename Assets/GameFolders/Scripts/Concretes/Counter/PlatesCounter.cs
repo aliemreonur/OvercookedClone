@@ -1,21 +1,17 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
 public class PlatesCounter : Counter
 {
-
     /// <summary>
-    /// This counter is only made for plates, no other thing can be placed in here
-    /// This is both a counter and a spawner ?!?!?
-    /// Splitting the spawner to another obj is feasable. 
+    /// This counter is only made for plates, no other thing can be placed in here 
     /// </summary>
-
+    #region Fields
     public List<Plate> platesOnTable = new List<Plate>();
     private PoolManager _poolManager;
     private GameManager _gameManager;
     [SerializeField] private int _numberOfMaxPlates = 3;
+    #endregion
 
     private void Start()
     {
@@ -27,16 +23,11 @@ public class PlatesCounter : Counter
 
     public override void HandleInteraction(IPlayerInteractionHandler playerInteractionHandler)
     {
-
-        //check if the player is carrying something
-        //if the player is carrying something, check if we
-
         if (!CheckValidInteraction(playerInteractionHandler))
             return;
 
         if (IsFilled)
             CollectableMovedToPlayer(playerInteractionHandler);
-
     }
 
     public override void CollectableMovedToPlayer(IPlayerInteractionHandler playerInteractionHandler)
@@ -52,7 +43,6 @@ public class PlatesCounter : Counter
 
     public override void GatherCollectableFromPlayer(IPlayerInteractionHandler playerInteractionHandler)
     {
-
         //this counter cannot handle any items from outside
     }
 

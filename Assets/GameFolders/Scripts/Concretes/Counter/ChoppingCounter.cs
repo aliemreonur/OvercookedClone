@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class ChoppingCounter : Counter, IProcessor
 {
+    #region Fields
     [SerializeField] private ProgressBar _progressBar;
-
-    private Animator _animator;
     public bool IsCutting => _isCutting;
     public ICuttable iCuttable => _iCuttable;
+
     private ICuttable _iCuttable;
     private bool _isCutting;
-
+    private Animator _animator;
     private const string ISCUTTING = "IsCutting";
+    #endregion
 
     protected override void Awake()
     {
@@ -23,7 +24,6 @@ public class ChoppingCounter : Counter, IProcessor
             Debug.LogError("The animator is null");
         _progressBar.gameObject.SetActive(false);
     }
-
 
     public override void HandleInteraction(IPlayerInteractionHandler playerInteractionHandler)
     {
@@ -82,7 +82,5 @@ public class ChoppingCounter : Counter, IProcessor
         else
             return true;
     }
-
-
 
 }

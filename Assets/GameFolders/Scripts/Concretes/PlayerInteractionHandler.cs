@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+//this would be better as mono.
 public class PlayerInteractionHandler : IPlayerInteractionHandler
 {
+    #region Fields
     [SerializeField] private Vector3 _foodCarryPos;
     [SerializeField] private LayerMask _interactableLayers;
     public event Action OnAlternateEnd; //redo of inputhandler
@@ -24,6 +24,7 @@ public class PlayerInteractionHandler : IPlayerInteractionHandler
 
     private const float InteractionDistance = 1f;
     private Transform _playerTransform;
+    #endregion
 
     public PlayerInteractionHandler(IEntityController playerController)
     {
@@ -53,7 +54,7 @@ public class PlayerInteractionHandler : IPlayerInteractionHandler
 
     public void Interact()
     {
-        //Too long - fix it
+        //TODO: Fix 3 degrees
         if(_currentInteractedObj == null)
         {
             if (HasFoodOnHand)
@@ -76,8 +77,6 @@ public class PlayerInteractionHandler : IPlayerInteractionHandler
             _currentInteractedObj.HandleInteraction(this);
     }
 
-    //throw item
-    //chop
     public virtual void AlternateInteract() 
     {
         if (_currentInteractedObj == null)
@@ -86,25 +85,9 @@ public class PlayerInteractionHandler : IPlayerInteractionHandler
         _currentInteractedObj.HandleAlternateInteraction(this);
     }
 
-    private void DeselectCurrentObj()
-    {
-        if (_currentInteractedObj != null)
-            _currentInteractedObj.DeSelect();
-    }
-
-    private bool CheckFrontForInteraction(out RaycastHit hitRay)
-    {
-        Debug.DrawRay(_playerTransform.position, _playerTransform.forward, Color.blue);
-        return Physics.Raycast(_playerTransform.position + Vector3.up, _playerTransform.forward, out hitRay, InteractionDistance, 1<<6);
-    }
-
     public void GatherFood(ICollectable collectable)
     {
-
-        //BUG!
-        //I have a plate - which I am full
-        //I want to gather the next item, and this forgots that I am carrying a food
-
+        //TODO: State Mechanism
         if (HasFoodOnHand || collectable == null)
             return;
 
@@ -137,13 +120,6 @@ public class PlayerInteractionHandler : IPlayerInteractionHandler
        
     }
 
-    private void AssignCollectable(ICollectable collectable)
-    {
-        _collectable = collectable;
-        collectable.ChangePos(_foodCarryPos, _playerTransform);
-        OnSuccessfulFoodTake?.Invoke();
-    }
-
     public void SetAlternateInteract(bool isOn)
     {
         IsAlternateInteracting = isOn;
@@ -157,6 +133,25 @@ public class PlayerInteractionHandler : IPlayerInteractionHandler
         _currentPlate = null;
         _collectable = null;
         HasFoodOnHand = false;
+    }
+
+    private void DeselectCurrentObj()
+    {
+        if (_currentInteractedObj != null)
+            _currentInteractedObj.DeSelect();
+    }
+
+    private void AssignCollectable(ICollectable collectable)
+    {
+        _collectable = collectable;
+        collectable.ChangePos(_foodCarryPos, _playerTransform);
+        OnSuccessfulFoodTake?.Invoke();
+    }
+
+    private bool CheckFrontForInteraction(out RaycastHit hitRay)
+    {
+        Debug.DrawRay(_playerTransform.position, _playerTransform.forward, Color.blue);
+        return Physics.Raycast(_playerTransform.position + Vector3.up, _playerTransform.forward, out hitRay, InteractionDistance, 1 << 6);
     }
 
 }

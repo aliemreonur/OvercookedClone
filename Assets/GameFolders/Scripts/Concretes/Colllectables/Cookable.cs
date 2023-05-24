@@ -1,7 +1,6 @@
 
 public class Cookable : Processable, ICookable
 {
-   
     private bool _isPlacedOn;
 
     override protected void Update()
@@ -9,7 +8,6 @@ public class Cookable : Processable, ICookable
         if (!_isPlacedOn)
             return;
         base.Update();
-
     }
 
     public void PlacedOn(bool isPlaced)

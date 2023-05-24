@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-//too long!
-//FAR TOO LONG!
+//TODO: This is far far too long
 public interface IPlayerInteractionHandler : IEntityController
 {
     ICollectable currentCollectable { get; }

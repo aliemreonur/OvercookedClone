@@ -1,24 +1,23 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
 
 public class Processable : Collectable, IProcessable
 {
+    #region Fields
     public event Action OnProcessFinished;
     public float TotalProcessTime => _totalProcessTime;
     public float ElapsedProcessTime => _usedProcessTime;
 
+    protected bool isProcessActive;
+    private List<GameObject> _childObjects = new List<GameObject>();
     private IPlayerInteractionHandler _playerInteractionHandler;
+    private bool _processed;
     private float _totalProcessTime = 1.5f; //better to gather this via settings as a const?
     private float _usedProcessTime = 0;
-    protected bool isProcessActive;
-    private bool _processed;
-
-    private List<GameObject> _childObjects = new List<GameObject>();
-
     private int _currentId;
     private int _childCount;
+    #endregion
 
     protected override void Awake()
     {
@@ -26,14 +25,12 @@ public class Processable : Collectable, IProcessable
         _childCount = transform.childCount;
         SetMainVisual();
     }
-
     override protected void Update()
     {
         base.Update();
         if(isProcessActive)
             CheckProcessTime();
     }
-
     private void OnDisable()
     {
         _currentId = 0;
@@ -41,13 +38,10 @@ public class Processable : Collectable, IProcessable
         _usedProcessTime = 0;
         _processed = false;
     }
-
     private void OnEnable()
     {
-
         SetInitialVisual();
     }
-
     public void ProcessActive()
     {
         if (_usedProcessTime < _totalProcessTime)
@@ -58,7 +52,6 @@ public class Processable : Collectable, IProcessable
     {
         isProcessActive = false;
     }
-
 
     private void Processed()
     {
@@ -79,7 +72,6 @@ public class Processable : Collectable, IProcessable
         else
             IsProcessable = false;
     }
-
     protected void UpdateProcessedVisual()
     {
         _childObjects[_currentId].SetActive(false);
@@ -87,8 +79,6 @@ public class Processable : Collectable, IProcessable
         StateUpdated();
         _childObjects[_currentId].SetActive(true);
     }
-
-
     protected bool CheckForNextState()
     {
         if (_currentId >= _childObjects.Count - 1)
@@ -138,7 +128,6 @@ public class Processable : Collectable, IProcessable
         else
             return true;
     }
-
 
     protected bool CheckProcessedTime()
     {

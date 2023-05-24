@@ -16,7 +16,6 @@ public class Delivery : Counter
 
     public override void GatherCollectableFromPlayer(IPlayerInteractionHandler playerInteractionHandler)
     {
-
         if(CheckValidInteraction(playerInteractionHandler))
         {
             _deliveredPlate = playerInteractionHandler.currentPlate;

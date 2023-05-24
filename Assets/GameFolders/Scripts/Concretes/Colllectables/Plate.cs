@@ -1,12 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 using System;
 
 public class Plate : Collectable, IPlate
 {
-    public event Action OnUnsuccesfulPlacement;
+    #region Fields
     public event Action OnPlateDelivered;
     public Action<int> OnIngredientAdded;
     public int NumberOfFoodsActive => GatherCurrentActiveChildNumber();
@@ -15,15 +13,14 @@ public class Plate : Collectable, IPlate
 
     private List<Transform> _allCollectables = new List<Transform>();
     private List<int> _activeCollectables = new List<int>();
+    #endregion
 
     protected override void Awake()
     {
         base.Awake();
         SetInitials(0, false, 0);
         GetAllChildren();
-   
     }
-
     private void OnEnable()
     {
         _plateState = new PlateState();
@@ -36,7 +33,6 @@ public class Plate : Collectable, IPlate
         DeActivateChildren();
         InitialSetUp();
     }
-
 
     public void AddFoodToPlate(IPlayerInteractionHandler playerInteractionHandler, out bool hasSucceeded)
     {
@@ -54,11 +50,10 @@ public class Plate : Collectable, IPlate
             hasSucceeded = false;
     }
 
-    public void Delivered() //maybe bool isSuccess?
+    public void Delivered()
     {
         OnPlateDelivered?.Invoke();
     }
-
 
     private void GetAllChildren()
     {
@@ -68,7 +63,6 @@ public class Plate : Collectable, IPlate
             child.gameObject.SetActive(false);
         }
         InitialSetUp();
-
     }
 
     private void InitialSetUp()
@@ -120,6 +114,5 @@ public class Plate : Collectable, IPlate
             childObj.gameObject.SetActive(false);
         }
     }
-
 
 }

@@ -7,6 +7,8 @@ public class Counter : Interactable, ICounter
     /// <summary>
     /// Need to make sure that all of the interactable objs has the visual selected object as the getchild(1)
     /// </summary>
+    /// 
+    #region Fields
     public Vector3 CollectablePosition => collectablePosition;
     public bool IsFilled { get; set; }
 
@@ -15,18 +17,12 @@ public class Counter : Interactable, ICounter
     protected Vector3 collectablePosition = new Vector3(0, 1.3f, 0);
     protected bool hasPlate = false;
     private WaitForSeconds deregisterTime = new WaitForSeconds(1);
-
-
-    //need to check if we are equipped with a plate
+    #endregion
 
     public override void HandleInteraction(IPlayerInteractionHandler playerInteractionHandler)
     {
         if (!CheckValidInteraction(playerInteractionHandler))
             return;
-
-        //if I am empty, and player has smt, take it to here
-        //else if I have a plate and player is empty, give the plate to the player
-        //else if I have a plate and player has a food, take the food
 
         if ((!IsFilled && !hasPlate) || (hasPlate && playerInteractionHandler.HasFoodOnHand))
         {
@@ -37,7 +33,7 @@ public class Counter : Interactable, ICounter
         
     }
 
-    //only for dispenser, shall it really placed in here?
+    //TODO: this methofd is only used by the dispenser
     public virtual void FoodSpawned(ICollectable collectable)
     {
         if (this.collectable != null)
@@ -55,14 +51,6 @@ public class Counter : Interactable, ICounter
         playerInteractionHandler.OnSuccessfulFoodTake += CounterEmpty;
         playerInteractionHandler.GatherFood(collectable);
         StartCoroutine(DeregisterFromEvent(playerInteractionHandler));
-    }
-
-    protected void CounterEmpty()
-    {
-        IsFilled = false;
-        collectable = null;
-        if (hasPlate)
-            hasPlate = false;
     }
 
     public virtual void GatherCollectableFromPlayer(IPlayerInteractionHandler playerInteractionHandler)
@@ -88,9 +76,16 @@ public class Counter : Interactable, ICounter
             if (playerInteractionHandler.currentCollectable.Id == 0) //if the player also has a plate, skip
                 return;
             plate.AddFoodToPlate(playerInteractionHandler, out successfulTake);
-            //?!?
             
         }
+    }
+
+    protected void CounterEmpty()
+    {
+        IsFilled = false;
+        collectable = null;
+        if (hasPlate)
+            hasPlate = false;
     }
 
     //too many ifs here
