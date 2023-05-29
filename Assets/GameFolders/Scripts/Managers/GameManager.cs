@@ -23,6 +23,7 @@ public class GameManager : Singleton<GameManager>
     public void StartGame()
     {
         IsRunning = true;
+        OnGameStart?.Invoke();
     }
 
     private void EndGame()

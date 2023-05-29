@@ -5,34 +5,27 @@ using System;
 
 public class Delivery : Counter
 {
-    private GameManager _gameManager;
-    private IPlate _deliveredPlate;
+    private OrderManager _orderManager;
 
-    protected override void Awake()
+    private void Start()
     {
-        base.Awake();
-        _gameManager = GameManager.Instance;
+        _orderManager = OrderManager.Instance;
+        if (_orderManager == null)
+            Debug.LogError("The delivery counter could not gather the order manager");
     }
 
     public override void GatherCollectableFromPlayer(IPlayerInteractionHandler playerInteractionHandler)
     {
         if(CheckValidInteraction(playerInteractionHandler))
         {
-            _deliveredPlate = playerInteractionHandler.currentPlate;
+            FoodsOrder fulfilledPlate = playerInteractionHandler.currentPlate.foodsOrder;
+            _orderManager.OrderFulfilled(fulfilledPlate);
+            if (playerInteractionHandler.currentPlate == null)
+                return;
+            playerInteractionHandler.currentPlate.DeActivate();
             base.GatherCollectableFromPlayer(playerInteractionHandler);
-            _gameManager.SuccessfulDelivery();
-            Debug.Log("Valid delivery");
-
-            if(_deliveredPlate != null)
-            {
-                _deliveredPlate.DeActivate();
-            }
-
             IsFilled = false;
             hasPlate = false;
-            _deliveredPlate = null;
-            playerInteractionHandler.DropFood();
-
         }
     }
 
@@ -46,10 +39,8 @@ public class Delivery : Counter
         if (!playerInteractionHandler.HasPlateOnHand)
             return false;
 
-        if (playerInteractionHandler.currentPlate.NumberOfFoodsActive < 6)
-            return false;
-
-        else if (playerInteractionHandler.currentPlate.foodsOrder == FoodsOrder.All)
+        //else if (_orderManager.CheckPlate(playerInteractionHandler.currentPlate.foodsOrder))
+        else if(_orderManager.activeOrders.Contains(playerInteractionHandler.currentPlate.foodsOrder))
             return true;
         else
             return false;
